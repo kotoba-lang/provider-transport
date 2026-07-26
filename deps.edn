@@ -2,7 +2,7 @@
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
         io.github.kotoba-lang/kototama
         {:git/url "https://github.com/kotoba-lang/kototama.git"
-         :git/sha "6459eb083df54082fd9c67de8bed108ee64cef76"}
+         :git/sha "40502c3cf4836c385a8399ce3e8d8e389f9a64dd"}
         io.github.kotoba-lang/security
         {:git/url "https://github.com/kotoba-lang/security.git"
          :git/sha "f409dbade106df076cefe640781b12db558f4135"}}
