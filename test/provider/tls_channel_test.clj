@@ -104,6 +104,28 @@
     (is (string? (:tls/cipher-suite info)))
     (tls/close! channel)))
 
+(deftest overlapping-pin-set-supports-bounded-certificate-rotation
+  (let [{:keys [server client certificate]} (contexts)
+        pin (sha256-hex (.getEncoded certificate))
+        next-pin (apply str (repeat 64 "a"))
+        rotating-server (start-server server)
+        channel (tls/open-client!
+                 (assoc (client-options client (:port rotating-server))
+                        :peer-certificate-sha256-set #{pin next-pin}))]
+    (is (= :rotation-set (:tls/peer-pin-profile (tls/description channel))))
+    (tls/close! channel)
+    @(:served rotating-server)
+    (let [retired-server (start-server server)]
+      (is (= :tls-channel/peer-pin-mismatch
+             (:problem
+              (ex-data
+               (try
+                 (tls/open-client!
+                  (assoc (client-options client (:port retired-server))
+                         :peer-certificate-sha256-set #{next-pin}))
+                 (catch clojure.lang.ExceptionInfo error error))))))
+      @(:served retired-server))))
+
 (deftest endpoint-address-pin-and-frame-bounds-fail-closed
   (let [{:keys [server client]} (contexts)
         first-server (start-server server)]
@@ -135,4 +157,3 @@
                     (catch clojure.lang.ExceptionInfo error error))))))
       (tls/close! channel)
       @(:served third-server))))
-

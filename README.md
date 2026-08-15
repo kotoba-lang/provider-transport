@@ -20,4 +20,9 @@ allowlists, HTTPS hostname verification, optional certificate pinning, socket
 timeouts, and a bounded length-prefixed frame. The channel description is
 inert metadata; only the live value can write, read, exchange, or close.
 
+Certificate rotation uses `:peer-certificate-sha256-set`: deploy an explicit
+old+new overlap set, rotate the server, then remove the retired digest. A
+single pin and a rotation set are mutually exclusive, empty/wildcard sets are
+rejected, and the channel description records which pin profile admitted it.
+
 Run `clojure -M:test`.
