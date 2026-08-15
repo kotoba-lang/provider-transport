@@ -14,5 +14,10 @@ provider-transport -> kototama (tender ABI)
 provider-transport -> security (shared policy)
 ```
 
-Run `clojure -M:test`.
+`provider.tls-channel` additionally exposes an opaque, host-side TLS netlayer
+for CapTP-style runtimes. It enforces exact endpoint and resolved-address
+allowlists, HTTPS hostname verification, optional certificate pinning, socket
+timeouts, and a bounded length-prefixed frame. The channel description is
+inert metadata; only the live value can write, read, exchange, or close.
 
+Run `clojure -M:test`.
