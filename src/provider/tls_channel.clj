@@ -90,7 +90,8 @@
   after the TLS handshake."
   [{:keys [ssl-context host port endpoint-allowlist resolved-address-allowlist
            connect-timeout-ms read-timeout-ms max-frame-bytes
-           peer-certificate-sha256 resolve-addresses]
+           peer-certificate-sha256 peer-certificate-sha256-set
+           resolve-addresses]
     :or {connect-timeout-ms 5000
          read-timeout-ms 5000
          max-frame-bytes default-max-frame-bytes
@@ -107,9 +108,16 @@
                    (int? connect-timeout-ms) (pos? connect-timeout-ms)
                    (int? read-timeout-ms) (pos? read-timeout-ms)
                    (int? max-frame-bytes) (pos? max-frame-bytes)
+                   (not (and peer-certificate-sha256
+                             peer-certificate-sha256-set))
                    (or (nil? peer-certificate-sha256)
                        (boolean (re-matches #"[0-9a-f]{64}"
                                             peer-certificate-sha256)))
+                   (or (nil? peer-certificate-sha256-set)
+                       (and (set? peer-certificate-sha256-set)
+                            (seq peer-certificate-sha256-set)
+                            (every? #(boolean (re-matches #"[0-9a-f]{64}" %))
+                                    peer-certificate-sha256-set)))
                    (ifn? resolve-addresses))
       (throw (ex-info "TLS channel options are not admitted"
                       {:problem :tls-channel/options-invalid})))
@@ -140,8 +148,12 @@
             (.startHandshake tls)
             (let [certificate (peer-certificate tls)
                   certificate-digest (hex (sha256 (.getEncoded certificate)))]
-              (when (and peer-certificate-sha256
-                         (not= peer-certificate-sha256 certificate-digest))
+              (when (and (or peer-certificate-sha256
+                             peer-certificate-sha256-set)
+                         (not (or (= peer-certificate-sha256
+                                     certificate-digest)
+                                  (contains? peer-certificate-sha256-set
+                                             certificate-digest))))
                 (throw (ex-info "TLS peer certificate pin mismatch"
                                 {:problem :tls-channel/peer-pin-mismatch})))
               (TlsChannel.
@@ -151,6 +163,10 @@
                 :tls/protocol (.getProtocol (.getSession tls))
                 :tls/cipher-suite (.getCipherSuite (.getSession tls))
                 :tls/peer-certificate-sha256 certificate-digest
+                :tls/peer-pin-profile
+                (cond peer-certificate-sha256 :single
+                      peer-certificate-sha256-set :rotation-set
+                      :else :trust-store)
                 :tls/max-frame-bytes max-frame-bytes}
                (Object.)
                (DataInputStream. (.getInputStream tls))
@@ -228,4 +244,3 @@
     (locking (-channel-lock channel)
       (.close ^SSLSocket (-channel-socket channel))))
   nil)
-
