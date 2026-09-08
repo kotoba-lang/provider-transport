@@ -4,7 +4,7 @@
   The channel is an opaque live capability. It frames bytes with a fixed
   unsigned 32-bit length and exposes only bounded write/read/exchange
   operations; no socket or stream crosses the boundary."
-  (:require [clojure.string :as str])
+  (:require [kotoba.lang.text :as str])
   (:import [java.io DataInputStream DataOutputStream EOFException]
            [java.net IDN InetAddress InetSocketAddress Socket]
            [java.security MessageDigest]
@@ -57,12 +57,12 @@
                           (subs host 1 (dec (count host)))
                           host)]
         (if (ip-literal? unbracketed)
-          (str/lower-case (.getHostAddress (InetAddress/getByName unbracketed)))
+          (str/lower (.getHostAddress (InetAddress/getByName unbracketed)))
           (let [without-root-dot (if (str/ends-with? unbracketed ".")
                                    (subs unbracketed 0 (dec (count unbracketed)))
                                    unbracketed)
                 ascii (IDN/toASCII without-root-dot IDN/USE_STD3_ASCII_RULES)]
-            (when (seq ascii) (str/lower-case ascii))))))
+            (when (seq ascii) (str/lower ascii))))))
     (catch Exception _ nil)))
 
 (defn- endpoint [host port]
