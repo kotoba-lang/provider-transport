@@ -25,4 +25,4 @@ old+new overlap set, rotate the server, then remove the retired digest. A
 single pin and a rotation set are mutually exclusive, empty/wildcard sets are
 rejected, and the channel description records which pin profile admitted it.
 
-Run `clojure -M:test`.
+Run `kbb -M:test`.
