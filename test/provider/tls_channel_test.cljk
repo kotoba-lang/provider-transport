@@ -91,7 +91,7 @@
         pin (sha256-hex (.getEncoded certificate))
         channel (tls/open-client! (assoc (client-options client port)
                                          :peer-certificate-sha256 pin))
-        payload (.getBytes "canonical-syrup-frame" "UTF-8")
+        payload (kbytes/utf8-bytes "canonical-syrup-frame")
         [response] (tls/exchange-frame! channel payload)
         info (tls/description channel)]
     (is (tls/tls-channel? channel))
