@@ -1,5 +1,5 @@
 (ns provider.transport-test
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [provider.transport :as transport]))
 
 (deftest transport-admission-uses-shared-four-axis-abac

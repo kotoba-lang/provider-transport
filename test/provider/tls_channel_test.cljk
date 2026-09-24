@@ -1,5 +1,5 @@
 (ns provider.tls-channel-test
-  (:require [kotoba.bytes :as kbytes] [clojure.test :refer [deftest is]]
+  (:require [kotoba.bytes :as kbytes] [kotoba.test :refer [deftest is]]
             [provider.tls-channel :as tls])
   (:import [java.io DataInputStream DataOutputStream]
            [java.net InetAddress]
