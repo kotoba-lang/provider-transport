@@ -1,12 +1,11 @@
 (ns provider.tls-channel-test
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.bytes :as kbytes] [clojure.test :refer [deftest is]]
             [provider.tls-channel :as tls])
   (:import [java.io DataInputStream DataOutputStream]
            [java.net InetAddress]
            [java.security KeyFactory KeyStore MessageDigest SecureRandom]
            [java.security.cert CertificateFactory]
            [java.security.spec PKCS8EncodedKeySpec]
-           [java.util Base64]
            [javax.net.ssl KeyManagerFactory SSLContext SSLServerSocket
             TrustManagerFactory]))
 
@@ -17,7 +16,7 @@
   "MIICxTCCAa2gAwIBAgIJAOhQp+Nf2kcpMA0GCSqGSIb3DQEBCwUAMBQxEjAQBgNVBAMMCWxvY2FsaG9zdDAgFw0yNjA4MTUxMTQyMzNaGA8yMTI2MDcyMjExNDIzM1owFDESMBAGA1UEAwwJbG9jYWxob3N0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyUEzhTHJsdCtRVIkYUW5YyljNmWXNUhDIA7sYlxoc9KzsrjnhsRlkgw8ytGf5Cdk0qOdKAmq1RaXDwQKeHYen1uAv/96crl5zOVBCwOHW+lNXDZZvAtaJb4YHZ0BXEMcHkk2fGvir2jKvUojcKZJ7DesPlWkBlgwTsAnNGtRuIc1zzH1SXJWPfOMVJD3UQXuzGcpAUjEJKUQVYNYcLPhtJwDWsxPZrCfzAhp+VpTor6UyFCFxctWfvp3qJClTKCX8jXHddi1moNqUxWyRplJOTh9S0eH8+nP0wIwedOxMEAsp5MYTWEVIuDWEOzNVp4CAQ8N4kBKLV3H8iT4aGWuPwIDAQABoxgwFjAUBgNVHREEDTALgglsb2NhbGhvc3QwDQYJKoZIhvcNAQELBQADggEBAJP407YP3BpPpu6cnwhnMbhPaWpFxUdMpnrTj8y7lV6azx9Ncj9psYLUNMKECC3pduOqPgiI9YbVp5S9WzYZWteAjwHZZgueemyj/8Igtury7m8NTURWpzq07dxpqon6tZBPmBeYWPErGua069qey5NzlukZo/pVb4zmNcmAva04yFE7c8wKA6nLc6rnmiQWDF26Fa+xIdckUgkrNaiqZNVTZ6gg/IVojVcSgHA+vbyjhHtGtZmw2F6EkQOQhm3Uyu6nov9kr8KXVcLsQJzcfvbbH6TJHRGmWWWQXvNMiRCvvO8wJxtA3JxB2ELJPuza+9x78ttRwuhfJcA6M0MgxNQ=")
 
 (defn- decode64 [value]
-  (.decode (Base64/getDecoder) value))
+  (kbytes/base64-decode-bytes value))
 
 (defn- certificate []
   (.generateCertificate (CertificateFactory/getInstance "X.509")
